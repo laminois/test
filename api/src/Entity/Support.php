@@ -20,11 +20,12 @@ use Doctrine\Common\Collections\Collection;
  *     normalizationContext={"groups"={"support.read"}},
  *     denormalizationContext={"groups"={"support.read","support.write"}},
  *     itemOperations={
- *      "get",
- *      "delete"
+ *      "get"={"force_eager"=true},
+ *      "delete",
+ *      "put"
  *     },
  *     collectionOperations={
- *      "get",
+ *      "get"={"force_eager"=true},
  *      "post"={"method"="POST"},
  *     }
  * )
@@ -35,6 +36,7 @@ class Support
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"support.read"})
      */
     private $id;
 
@@ -45,9 +47,8 @@ class Support
     private $libelle;
 
     /**
-     * @var TypeSupport foreign key TYPE_SUPPORT
      *
-     * @ORM\ManyToOne(targetEntity=TypeSupport::class, cascade={"persist"}, inversedBy="support", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity=TypeSupport::class, cascade={"persist"}, inversedBy="support")
      * @ORM\JoinColumn(name="id_type_support", referencedColumnName="ID_TYPE_SUPPORT", nullable=false)
      * @Groups({"support.read","support.write"})
      * @ApiSubresource(maxDepth=1)
@@ -90,9 +91,8 @@ class Support
     /******************************/
     /* TypeSupport                */
     /******************************/
-    /**
-     * @return Collection|TypeSupport[]
-     */
+
+
     public function getTypeSupport()
     {
         return $this->typeSupport;
@@ -109,6 +109,12 @@ class Support
         if ($this->typeSupport->contains($typeSupport)) {
             $this->typeSupport>removeElement($typeSupport);
         }
+        return $this;
+    }
+
+    public function setTypeSupport(TypeSupport $typeSupport): self
+    {
+        $this->typeSupport = $typeSupport;
         return $this;
     }
 }
